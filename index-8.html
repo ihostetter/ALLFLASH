@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cisco SMB Flashcards</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f4f8;
+    }
+    .card {
+      background: white;
+      width: 90%;
+      max-width: 600px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      text-align: center;
+    }
+    .question, .answer {
+      font-size: 1.2rem;
+      margin: 20px 0;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      background-color: #0078d4;
+      color: white;
+      cursor: pointer;
+    }
+    button:disabled {
+      background-color: #a0a0a0;
+      cursor: not-allowed;
+    }
+    button:hover:not(:disabled) {
+      background-color: #005ea6;
+    }
+    #search-input {
+      width: 80%;
+      padding: 10px;
+      font-size: 1rem;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="question" id="flashcard-question">Click "Next" to start.</div>
+    <div class="answer" id="flashcard-answer" style="display: none;"></div>
+    <button onclick="showAnswer()">Show Answer</button>
+    <button id="prev-button" onclick="prevCard()" disabled>Previous</button>
+    <button onclick="nextCard()">Next</button>
+    <input type="text" id="search-input" placeholder='Enter search or "quoted phrase"...' />
+    <button onclick="searchCard()">Search</button>
+  </div>
+
+  <script>
+const allFlashcards = [
+  { question: "What is the primary purpose of Umbrella&#x27;s Secure Web Gateway?", answer: "logs and inspects web traffic for full visibility, URL and application controls, and protection against malware" },
+  { question: "Which Cisco product is part of the smart experience for empowering IT?", answer: "Meraki Insight" },
+  { question: "Which Cisco product provides SD-WAN capabilities for SMBs?", answer: "Cisco Meraki MX series" },
+  { question: "Which Cisco product provides identity and device visibility for SMBs?", answer: "Cisco Identity Services Engine (ISE)" },
+  { question: "Which Cisco product features integrated Mobile Device Management?", answer: "Meraki" },
+  { question: "Which Cisco solution enables a hybrid experience and offers a VPN solution?", answer: "remote solution" },
+  { question: "Which Cisco product is part of Remote SMB for enabling people?", answer: "Cisco Secure Client" },
+  { question: "Which Cisco solution helps keep a healthcare patient&#x27;s information secure?", answer: "Cisco Duo and Cisco Umbrella." },
+  { question: "Which security challenge do SMBs face?", answer: "global shortage of security experts" },
+  { question: "Which Cisco product secures the perimeterless, work-from-anywhere world with Zero Trust?", answer: "Duo" },
+  { question: "What is a functional requirement for a secure SMB?", answer: "zero trust identity-based access to applications with multifactor authentication" },
+  { question: "What is a crucial concern for Hybrid SMB?", answer: "Protecting employees, devices, and company data." },
+  { question: "Which Cisco product enables video conferencing and communication?", answer: "Cisco Webex." },
+  { question: "What does the hybrid SMB experience deliver to the customer?", answer: "secure Connectivity and dynamic collaboration" },
+  { question: "Which Cisco product is part of the Secure SMB experience for enabling people?", answer: "Cisco Umbrella" },
+  { question: "Which Cisco product protects against the loss of sensitive data?", answer: "Umbrella" },
+  { question: "Which Cisco product integrates with Webex to provide secure collaboration for SMBs?", answer: "Cisco SecureX and Duo" },
+  { question: "Which Cisco product offers cloud-based phone systems for SMBs?", answer: "Webex Calling" },
+  { question: "What is a benefit of using Meraki in retail SMB?", answer: "quickly troubleshoot issues" }
+];
+    let filteredFlashcards = [...allFlashcards];
+    let currentIndex = -1;
+
+    function updateCard(index) {
+      if (filteredFlashcards.length === 0) {
+        document.getElementById('flashcard-question').innerText = "No matching question found.";
+        document.getElementById('flashcard-answer').style.display = 'none';
+        document.getElementById('flashcard-answer').innerText = "";
+        return;
+      }
+      document.getElementById('flashcard-question').innerText = filteredFlashcards[index].question;
+      document.getElementById('flashcard-answer').style.display = 'none';
+      document.getElementById('flashcard-answer').innerText = filteredFlashcards[index].answer;
+      document.getElementById('prev-button').disabled = (index <= 0);
+    }
+
+    function nextCard() {
+      if (filteredFlashcards.length === 0) return;
+      currentIndex = (currentIndex + 1) % filteredFlashcards.length;
+      updateCard(currentIndex);
+    }
+
+    function prevCard() {
+      if (filteredFlashcards.length === 0 || currentIndex <= 0) return;
+      currentIndex -= 1;
+      updateCard(currentIndex);
+    }
+
+    function showAnswer() {
+      if (currentIndex >= 0) {
+        document.getElementById('flashcard-answer').style.display = 'block';
+      }
+    }
+
+    function searchCard() {
+      const input = document.getElementById('search-input').value.trim();
+      const lcInput = input.toLowerCase();
+      if (!input) {
+        filteredFlashcards = [...allFlashcards];
+      } else if (input.startsWith('"') && input.endsWith('"')) {
+        const exact = lcInput.slice(1, -1);
+        filteredFlashcards = allFlashcards.filter(card =>
+          card.question.toLowerCase().includes(exact)
+        );
+      } else {
+        const terms = lcInput.split(" ");
+        filteredFlashcards = allFlashcards.filter(card =>
+          terms.every(term => card.question.toLowerCase().includes(term))
+        );
+      }
+      currentIndex = 0;
+      updateCard(currentIndex);
+    }
+  </script>
+</body>
+</html>
